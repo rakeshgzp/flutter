@@ -9,10 +9,9 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 450,
-      child: transactions.isEmpty
-          ? Column(
+    return transactions.isEmpty
+        ? LayoutBuilder(builder: (ctx, constraints) {
+            return Column(
               children: <Widget>[
                 Text(
                   'No transactions added yet!',
@@ -22,45 +21,52 @@ class TransactionList extends StatelessWidget {
                   height: 20,
                 ),
                 Container(
-                  height: 200,
+                  height: constraints.maxHeight * 0.6,
                   child: Image.asset(
                     'assets/images/waiting.png',
                     fit: BoxFit.cover,
                   ),
                 ),
               ],
-            )
-          : ListView.builder(
-              itemBuilder: (ctx, index) {
-                return Card(
-                  elevation: 5,
-                  margin: EdgeInsets.symmetric(
-                    vertical: 8,
-                    horizontal: 5,
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      radius: 30,
-                      child: Padding(
-                        padding: EdgeInsets.all(6),
-                        child: Text('Rs ${transactions[index].amount}'),
-                      ),
+            );
+          })
+        : ListView.builder(
+            itemBuilder: (ctx, index) {
+              return Card(
+                elevation: 5,
+                margin: EdgeInsets.symmetric(
+                  vertical: 8,
+                  horizontal: 5,
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    radius: 30,
+                    child: Padding(
+                      padding: EdgeInsets.all(6),
+                      child: Text('Rs ${transactions[index].amount}'),
                     ),
-                    title: Text(
-                      transactions[index].title,
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    subtitle: Text(
-                        DateFormat.yMMMMd().format(transactions[index].date)),
-                    trailing: IconButton(
-                        icon: Icon(Icons.delete),
-                        color: Theme.of(context).errorColor,
-                        onPressed: () => deleteTx(transactions[index].id)),
                   ),
-                );
-              },
-              itemCount: transactions.length,
-            ),
-    );
+                  title: Text(
+                    transactions[index].title,
+                    style: Theme.of(context).textTheme.headline6,
+                  ),
+                  subtitle: Text(
+                      DateFormat.yMMMMd().format(transactions[index].date)),
+                  trailing: MediaQuery.of(context).size.width > 400
+                      ? FlatButton.icon(
+                          onPressed: () => deleteTx(transactions[index].id),
+                          icon: Icon(Icons.delete),
+                          label: Text('Delete'),
+                          textColor: deleteTx(transactions[index].id),
+                        )
+                      : IconButton(
+                          icon: Icon(Icons.delete),
+                          color: Theme.of(context).errorColor,
+                          onPressed: () => deleteTx(transactions[index].id)),
+                ),
+              );
+            },
+            itemCount: transactions.length,
+          );
   }
 }
